@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 
-
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -111,15 +111,42 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-import dj_database_url
-DATABASES['default'] = dj_database_url.config()
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ALLOWED_HOSTS = ['*']
-STATIC_ROOT = 'staticfiles'
 DEBUG = False
+
 try:
+    # 存在する場合、ローカルの設定読み込み
     from .local_settings import *
 except ImportError:
     pass
+
+if not DEBUG:
+    # Heroku settings
+
+    # staticの設定
+    import os
+    import django_heroku
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    # Static files (CSS, JavaScript, Images)
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    STATIC_URL = '/static/'
+
+    DATABASES['default'] = dj_database_url.config()
+
+    # Extra places for collectstatic to find static files.
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
+
+    ALLOWED_HOSTS = ['*']
+
+    MIDDLEWARE += [
+        'whitenoise.middleware.WhiteNoiseMiddleware',
+    ]
+
+    # HerokuのConfigを読み込み
+    django_heroku.settings(locals())
+
 
 
