@@ -1,2 +1,7 @@
-settings_local.py
-__pycache__/
+.vscode
+__pycache__
+env
+staticfiles
+db.sqlite3
+*.py[co]
+local_settings.py

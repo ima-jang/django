@@ -19,12 +19,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-yd4ly22a^n=m12m2i8ep#um!g548_)y49v(^)5a^28cebwk1_o'
 
 
-
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -71,15 +67,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'dena.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 
 # Password validation
@@ -124,36 +111,15 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
+import dj_database_url
+DATABASES['default'] = dj_database_url.config()
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+ALLOWED_HOSTS = ['*']
+STATIC_ROOT = 'staticfiles'
 DEBUG = False
-
 try:
-    # 存在する場合、ローカルの設定読み込み
-    from .settings_local import *
+    from .local_settings import *
 except ImportError:
     pass
 
-if not DEBUG:
-    # Heroku settings
 
-    # staticの設定
-    import os
-    import django_heroku
-
-    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-    # Static files (CSS, JavaScript, Images)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATIC_URL = '/static/'
-
-    # Extra places for collectstatic to find static files.
-    STATICFILES_DIRS = (
-        os.path.join(BASE_DIR, 'static'),
-    )
-
-    MIDDLEWARE += [
-        'whitenoise.middleware.WhiteNoiseMiddleware',
-    ]
-
-    # HerokuのConfigを読み込み
-    django_heroku.settings(locals())
